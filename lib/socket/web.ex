@@ -224,6 +224,7 @@ defmodule Socket.Web do
     protocols  = options[:protocol]
     extensions = options[:extensions]
     key        = :base64.encode(options[:key] || "fork the dongles")
+    headers    = options[:headers]
 
     client = mod.connect!(address, port)
     client |> Socket.packet!(:raw)
@@ -236,8 +237,9 @@ defmodule Socket.Web do
       "Sec-WebSocket-Key: #{key}", "\r\n",
       if(protocols, do: ["Sec-WebSocket-Protocol: #{Enum.join protocols, ", "}", "\r\n"], else: []),
       if(extensions, do: ["Sec-WebSocket-Extensions: #{Enum.join extensions, ", "}", "\r\n"], else: []),
-      "Sec-WebSocket-Version: 13", "\r\n",
-      "\r\n"]
+      "Sec-WebSocket-Version: 13", "\r\n"] ++
+      Enum.join(headers, "\r\n") ++
+      ["\r\n","\r\n"]
 
     client |> Socket.packet(:http_bin)
     { :http_response, _, 101, _ } = client |> Socket.Stream.recv!
