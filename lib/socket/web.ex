@@ -238,8 +238,8 @@ defmodule Socket.Web do
       if(protocols, do: ["Sec-WebSocket-Protocol: #{Enum.join protocols, ", "}", "\r\n"], else: []),
       if(extensions, do: ["Sec-WebSocket-Extensions: #{Enum.join extensions, ", "}", "\r\n"], else: []),
       "Sec-WebSocket-Version: 13", "\r\n"] ++
-      Enum.join(headers, "\r\n") ++
-      ["\r\n","\r\n"]
+      Enum.flat_map(headers, &([&1,"\r\n"])) ++
+      ["\r\n"]
 
     client |> Socket.packet(:http_bin)
     { :http_response, _, 101, _ } = client |> Socket.Stream.recv!
