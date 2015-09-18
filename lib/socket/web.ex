@@ -495,11 +495,15 @@ defmodule Socket.Web do
   end
 
   @spec mask(binary) :: { integer, binary }
+  # defp mask(data) do
+  #   case :crypto.strong_rand_bytes(4) do
+  #     << key :: 32 >> ->
+  #       { key, unmask(key, data) }
+  #   end
+  # end
+
   defp mask(data) do
-    case :crypto.strong_rand_bytes(4) do
-      << key :: 32 >> ->
-        { key, unmask(key, data) }
-    end
+    {0, data}
   end
 
   @spec mask(integer, binary) :: { integer, binary }
