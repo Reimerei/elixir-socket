@@ -242,8 +242,15 @@ defmodule Socket.Web do
       ["\r\n"]
 
     client |> Socket.packet(:http_bin)
-    { :http_response, _, 101, _ } = client |> Socket.Stream.recv!
-    headers                       = headers(%{}, client)
+    res = client |> Socket.Stream.recv!
+    headers = headers(%{}, client)
+
+    case res do
+      { :http_response, _, 101, _ } -> 
+        :noop
+      { :http_response, _, code, message }  ->
+        raise RuntimeError, message: {code, headers, message}
+    end
 
     if String.downcase(headers["upgrade"]) != "websocket" or
        String.downcase(headers["connection"]) != "upgrade" do
